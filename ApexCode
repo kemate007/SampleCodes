@@ -1,0 +1,54 @@
+Q 1. Create a field on Account named "Number of Contacts". Populate this field with the number of contacts related to an account. 
+   
+
+Trigger ContactTrigger on Contact (after insert, after update, after delete, after undelete) {
+   
+    Set<Id> acctIds = new Set<Id>();
+    List<Account> acctsToRollup = new List<Account>();
+
+if(Trigger.isAfter){
+
+  if(Trigger.isInsert || Trigger.isUndelete){
+       for (Contact c : Trigger.new) {
+        if (c.AccountId != null) {
+            acctIds.add(c.AccountId);
+            }
+        }
+    }
+    if(Trigger.isDelete){
+       for (Contact c : Trigger.old) {
+        if (c.AccountId != null) {
+            acctIds.add(c.AccountId);
+            }
+        }
+    }
+    if(Trigger.isInsert || Trigger.isUndelete){
+       for (Contact c : Trigger.new) {
+        if (c.AccountId != null) {
+            acctIds.add(c.AccountId);
+            }
+        }
+    }
+   if(Trigger.isUpdate){
+       for (Contact c : Trigger.new) {
+        if (c.AccountId != null && c.AccountId != Trigger.oldMap.get(c.Id).AccountId)) {
+            acctIds.add(c.AccountId);
+            }
+        }
+    }
+}
+    
+    for (AggregateResult ar : [SELECT AccountId , Count(id) ContactCount  FROM Contact WHERE AccountId in: acctIds 
+                               GROUP BY AccountId]){
+
+        Account a = new Account();
+
+        a.Id = (Id) ar.get('AccountId');
+        a.Number_of_Contacts__c = (Integer)ar.get('ContactCount');
+        acctsToRollup.add(a);
+
+    }
+
+    if(!acctsToRollup.isEmpty()){
+    update acctsToRollup;
+   }
