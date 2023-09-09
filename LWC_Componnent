@@ -1,0 +1,32 @@
+ Q 2. Build a basic lightning component that can query a list of 10 most recently created accounts and display it using a lightning app. 
+
+                                       Apex--->>
+
+public with sharing class AccountController {
+    @AuraEnabled(cacheable=true)
+    public static List<Account> getRecentAccounts() {
+        return [SELECT Id, Name FROM Account ORDER BY CreatedDate DESC LIMIT 10];
+    }
+}
+
+                                        JS--->>>
+
+import { LightningElement, wire } from 'lwc';
+import getRecentAccounts from '@salesforce/apex/AccountController.getRecentAccounts';
+
+export default class RecentAccountsList extends LightningElement {
+    @wire(getRecentAccounts)
+    accounts;
+}
+
+                                      HTML----->>>
+<template>
+    <lightning-card title="Recent Accounts">
+        <div >
+            <template if:true={accounts.data}>
+                    <template for:each={accounts.data} for:item="account">
+                        <li key={account.Id}>{account.Name}</li>
+                    </template>
+            </template>
+            <template if:true={accounts.error}>
+           
