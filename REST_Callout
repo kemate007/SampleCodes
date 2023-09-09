@@ -1,0 +1,27 @@
+
+Q 3. Make a basic http callout and print the result using system.debug
+
+public with sharing class HttpColloutExampleDemo {
+
+    public static void makeHttpCallout(String) {
+
+        String endpointUrl = 'https://postman-echo.com/get?foo1=bar1&foo2=bar2';
+
+        HttpRequest request = new HttpRequest();
+        request.setEndpoint(endpointUrl);
+        request.setMethod('GET');
+        System.debug(request);
+
+
+        Http http = new Http();
+
+        HttpResponse response = http.send(request);
+        System.debug(response);
+
+        if (response.getStatusCode() == 200) {
+            System.debug('HTTP Response Body: ' + response.getBody());
+        } else {
+            System.debug('HTTP Request Failed with Status Code: ' + response.getStatusCode());
+        }
+    }
+}
