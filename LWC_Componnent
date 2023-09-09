@@ -29,4 +29,8 @@ export default class RecentAccountsList extends LightningElement {
                     </template>
             </template>
             <template if:true={accounts.error}>
-           
+                {accounts.error}
+            </template>
+        </div>
+    </lightning-card>
+</template>
